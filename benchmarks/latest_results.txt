@@ -1,4 +1,4 @@
-=== SpikenautDistill E-prop Tick Benchmark ===
+=== SynapticDistill E-prop Tick Benchmark ===
 Warmup ticks: 5000
 Bench ticks : 50000
 Wall time   : 0.078s

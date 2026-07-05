@@ -1,10 +1,12 @@
-"""
-SpikenautDistill.jl
+# SPDX-License-Identifier: MIT OR Apache-2.0
 
-Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more. 
+"""
+SynapticDistill.jl
+
+Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more.
 Works with pure SNNs or hybrid SNN+LLM systems.
 """
-module SpikenautDistill
+module SynapticDistill
 
 using LinearAlgebra
 using Statistics

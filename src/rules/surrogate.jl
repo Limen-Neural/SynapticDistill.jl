@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 """
 Implementations of surrogate gradient functions for backpropagation through spiking neurons.
 """

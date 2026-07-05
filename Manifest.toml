@@ -704,7 +704,7 @@ weakdeps = ["ChainRulesCore"]
     [deps.SpecialFunctions.extensions]
     SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
 
-[[deps.SpikenautDistill]]
+[[deps.SynapticDistill]]
 deps = ["LinearAlgebra", "MLUtils", "Printf", "Statistics", "Zygote"]
 path = "."
 uuid = "c4d8e2f3-9a0b-4c1d-8e5f-2a3b4c5d6e7f"

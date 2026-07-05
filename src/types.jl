@@ -1,5 +1,7 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 """
-Core data structures for SpikenautDistill.
+Core data structures for SynapticDistill.
 """
 
 # A batch of spike data, typically received from a simulation or hardware.

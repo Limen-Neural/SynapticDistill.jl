@@ -1,16 +1,16 @@
 using Test
-using SpikenautDistill
+using SynapticDistill
 using LinearAlgebra
 
-@testset "SpikenautDistill" begin
+@testset "SynapticDistill" begin
 
     @testset "Package loads" begin
-        @test @isdefined(SpikenautDistill)
-        @test SpikenautDistill isa Module
-        @test isdefined(SpikenautDistill, :create_network)
-        @test isdefined(SpikenautDistill, :eprop_update!)
-        @test isdefined(SpikenautDistill, :distill_to_channels)
-        @test isdefined(SpikenautDistill, :export_parameters_mem)
+        @test @isdefined(SynapticDistill)
+        @test SynapticDistill isa Module
+        @test isdefined(SynapticDistill, :create_network)
+        @test isdefined(SynapticDistill, :eprop_update!)
+        @test isdefined(SynapticDistill, :distill_to_channels)
+        @test isdefined(SynapticDistill, :export_parameters_mem)
     end
 
     @testset "fast_sigmoid_grad" begin
@@ -33,7 +33,7 @@ using LinearAlgebra
 
         # Weights in [W_MIN, W_MAX]
         for n in net.neurons
-            @test all(SpikenautDistill.W_MIN .≤ n.weights .≤ SpikenautDistill.W_MAX)
+            @test all(SynapticDistill.W_MIN .≤ n.weights .≤ SynapticDistill.W_MAX)
         end
 
         # Custom size
@@ -57,7 +57,7 @@ using LinearAlgebra
 
         # Weights remain bounded
         for n in net.neurons
-            @test all(SpikenautDistill.W_MIN .≤ n.weights .≤ SpikenautDistill.W_MAX)
+            @test all(SynapticDistill.W_MIN .≤ n.weights .≤ SynapticDistill.W_MAX)
         end
 
         # Multiple updates
@@ -65,7 +65,7 @@ using LinearAlgebra
             eprop_update!(net, rand(Float32, 16), rand(Float32))
         end
         for n in net.neurons
-            @test all(SpikenautDistill.W_MIN .≤ n.weights .≤ SpikenautDistill.W_MAX)
+            @test all(SynapticDistill.W_MIN .≤ n.weights .≤ SynapticDistill.W_MAX)
         end
     end
 

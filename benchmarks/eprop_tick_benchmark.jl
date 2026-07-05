@@ -1,4 +1,4 @@
-using SpikenautDistill
+using SynapticDistill
 using Printf
 using Random
 using Statistics
@@ -38,7 +38,7 @@ function run_benchmark()
     mean_us = mean(per_tick_us)
     ticks_per_sec = BENCH_TICKS / wall_s
 
-    println("=== SpikenautDistill E-prop Tick Benchmark ===")
+    println("=== SynapticDistill E-prop Tick Benchmark ===")
     @printf("Warmup ticks: %d\n", WARMUP_TICKS)
     @printf("Bench ticks : %d\n", BENCH_TICKS)
     @printf("Wall time   : %.3fs\n", wall_s)

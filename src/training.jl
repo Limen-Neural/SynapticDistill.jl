@@ -1,5 +1,7 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 """
-Main training entry point for SpikenautDistill.
+Main training entry point for SynapticDistill.
 """
 
 # A placeholder for the model's forward pass. 

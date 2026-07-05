@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 """
 Implementation of the Online Spatio-Temporal Trace Training (OTTT) rule.
 """

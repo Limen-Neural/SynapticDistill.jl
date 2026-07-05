@@ -1,8 +1,11 @@
-# SpikenautDistill.jl
+# SynapticDistill.jl
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE-APACHE)
 
 **Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more. Works with pure SNNs or hybrid SNN+LLM systems.**
 
-`SpikenautDistill.jl` is a flexible and performant library for training spiking neural networks (SNNs) using online (event-based) learning rules. It is designed to be framework-agnostic, allowing researchers to bring their own models, loss functions, and data sources.
+`SynapticDistill.jl` is a flexible and performant library for training spiking neural networks (SNNs) using online (event-based) learning rules. It is designed to be framework-agnostic, allowing researchers to bring their own models, loss functions, and data sources.
 
 ## Core Philosophy
 
@@ -15,7 +18,7 @@
 Here's a simple example of how to train an SNN using a standard loss function.
 
 ```julia
-using SpikenautDistill
+using SynapticDistill
 
 # 1. Define your SNN model
 mutable struct MySNN
@@ -37,11 +40,11 @@ model, state = train_step!(model, spike_batch, mse_loss, rule=:eprop)
 println("Loss: ", state.loss)
 ```
 
-For a complete, runnable example, see [`examples/pure_snn_training.jl`](file:///home/raulmc/SpikenautDistill.jl/examples/pure_snn_training.jl).
+For a complete, runnable example, see [`examples/pure_snn_training.jl`](examples/pure_snn_training.jl).
 
 ## Hybrid Usage (with OLMoE Loss via `spikenaut-spine`)
 
-`SpikenautDistill.jl` is perfect for hybrid systems where an SNN is trained to distill knowledge from a larger model. The key is to provide a loss function that captures the output of the external model.
+`SynapticDistill.jl` is perfect for hybrid systems where an SNN is trained to distill knowledge from a larger model. The key is to provide a loss function that captures the output of the external model.
 
 ```julia
 # --- In your spikenaut-spine listener ---
@@ -59,7 +62,7 @@ model, state = train_step!(model, spike_batch, loss_fn, rule=:eprop)
 send_to_spine(GradientUpdate(state.gradients))
 ```
 
-For a complete, runnable example, see [`examples/hybrid_olmoe_training.jl`](file:///home/raulmc/SpikenautDistill.jl/examples/hybrid_olmoe_training.jl).
+For a complete, runnable example, see [`examples/hybrid_olmoe_training.jl`](examples/hybrid_olmoe_training.jl).
 
 ## Available Rules
 
@@ -72,10 +75,16 @@ Any function that takes the model's output and returns a scalar loss is a valid 
 
 ## Integration with the Spikenaut Ecosystem
 
-`SpikenautDistill.jl` is designed to integrate seamlessly with the other components of the Spikenaut ecosystem:
+`SynapticDistill.jl` is designed to integrate seamlessly with the other components of the Spikenaut ecosystem:
 
-- **`spikenaut-spine`**: The spine can be used to pass spike data and LLM targets to `SpikenautDistill.jl` and to receive gradients for updating the SNN.
-- **`spikenaut-hybrid`**: The hybrid system can use `SpikenautDistill.jl` as its training engine for the SNN component.
+- **`spikenaut-spine`**: The spine can be used to pass spike data and LLM targets to `SynapticDistill.jl` and to receive gradients for updating the SNN.
+- **`spikenaut-hybrid`**: The hybrid system can use `SynapticDistill.jl` as its training engine for the SNN component.
+
+## License
+
+This project is dual-licensed under either the [MIT License](LICENSE) or the [Apache License 2.0](LICENSE-APACHE), at your option.
+
+This license change is independent of boundary work (#13).
 
 ## Contributing
 
