@@ -1,7 +1,6 @@
 # SynapticDistill.jl
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE-APACHE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 **Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more. Works with pure SNNs or hybrid SNN+LLM systems.**
 
@@ -82,9 +81,7 @@ Any function that takes the model's output and returns a scalar loss is a valid 
 
 ## License
 
-This project is dual-licensed under either the [MIT License](LICENSE) or the [Apache License 2.0](LICENSE-APACHE), at your option.
-
-This license change is independent of boundary work (#13).
+This project is licensed under the [GNU GPL v3.0 or later](LICENSE).
 
 ## Contributing
 
