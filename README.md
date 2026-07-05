@@ -84,8 +84,6 @@ Any function that takes the model's output and returns a scalar loss is a valid 
 
 This project is dual-licensed under either the [MIT License](LICENSE) or the [Apache License 2.0](LICENSE-APACHE), at your option.
 
-This license change is independent of boundary work (#13).
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or pull request to discuss your ideas.
