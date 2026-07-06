@@ -42,7 +42,7 @@ println("Loss: ", state.loss)
 
 For a complete, runnable example, see [`examples/pure_snn_training.jl`](examples/pure_snn_training.jl).
 
-## Hybrid Usage (with OLMoE Loss via `spikenaut-spine`)
+## Hybrid Usage (with MoE Loss via `spikenaut-spine`)
 
 `SynapticDistill.jl` is perfect for hybrid systems where an SNN is trained to distill knowledge from a larger model. The key is to provide a loss function that captures the output of the external model.
 
@@ -62,7 +62,7 @@ model, state = train_step!(model, spike_batch, loss_fn, rule=:eprop)
 send_to_spine(GradientUpdate(state.gradients))
 ```
 
-For a complete, runnable example, see [`examples/hybrid_olmoe_training.jl`](examples/hybrid_olmoe_training.jl).
+For a complete, runnable example, see [`examples/hybrid_moe_training.jl`](examples/hybrid_moe_training.jl).
 
 ## Available Rules
 
