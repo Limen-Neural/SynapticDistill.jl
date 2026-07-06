@@ -1,0 +1,31 @@
+# Julia
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+Manifest.toml
+!Manifest.toml
+
+# System
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Environment
+.env
+*.env.local
+
+# Build artifacts
+docs/build/
+docs/site/
+
+# Benchmark results (regenerated)
+benchmarks/latest_results.txt
+
+# Agent tooling
+.mimocode/

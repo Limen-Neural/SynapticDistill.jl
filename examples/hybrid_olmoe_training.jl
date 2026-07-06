@@ -1,4 +1,4 @@
-using SpikenautDistill
+using SynapticDistill
 
 # This example simulates a hybrid training scenario where the loss is derived
 # from an external model (e.g., a large language model like OLMoE).

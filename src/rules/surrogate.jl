@@ -1,9 +1,11 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 """
 Implementations of surrogate gradient functions for backpropagation through spiking neurons.
 """
 
 """
-    surrogate_heaviside(x, γ=1.0)
+    surrogate_heaviside(x, γ=10.0)
 
 A simple rectangular surrogate for the Heaviside step function's derivative.
 

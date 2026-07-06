@@ -1,4 +1,4 @@
-using SpikenautDistill
+using SynapticDistill
 
 # 1. Define a simple SNN model.
 # In a real scenario, this would be a more complex model from a library like Flux or a custom struct.

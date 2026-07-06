@@ -1,8 +1,8 @@
-name = "SpikenautDistill"
+name = "SynapticDistill"
 uuid = "c4d8e2f3-9a0b-4c1d-8e5f-2a3b4c5d6e7f"
 version = "0.2.0"
 description = "Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more. Works with pure SNNs or hybrid SNN+LLM systems."
-license = "GPL-3.0-or-later"
+license = "MIT OR Apache-2.0"
 authors = ["Raul Montoya Cardenas <montoyaraul34@gmail.com>"]
 
 [deps]
