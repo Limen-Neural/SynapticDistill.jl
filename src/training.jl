@@ -48,8 +48,7 @@ function train_step!(model, spikes::SpikeBatch, loss_fn;
         println("Applying e-prop rule (not fully implemented).")
     elseif rule == :ottt
         # update_ottt!(model, spikes, loss; kwargs...)
-        println("Applying OTTT rule (not fully implemented).
-")
+        println("Applying OTTT rule (not fully implemented).")
     else
         error("Unknown training rule: `$rule`")
     end

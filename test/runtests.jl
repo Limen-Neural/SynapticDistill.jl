@@ -17,6 +17,12 @@ using LinearAlgebra
     end
 
     @testset "surrogate gradients" begin
+        # heaviside surrogate: at threshold → γ (10.0 default)
+        @test surrogate_heaviside(0.0f0) ≈ 10.0f0 atol=0.01f0
+        for v in -2.0f0:0.5f0:4.0f0
+            @test surrogate_heaviside(v) ≥ 0.0f0
+        end
+
         # sigmoid surrogate: at threshold → 0.25
         @test surrogate_sigmoid(0.0f0, 1.0f0) ≈ 0.25f0 atol=0.01f0
         # Always non-negative
@@ -24,7 +30,7 @@ using LinearAlgebra
             @test surrogate_sigmoid(v, 1.0f0) ≥ 0.0f0
         end
 
-        # exponential surrogate: at threshold → 0.5
+        # exponential surrogate: at threshold → 1.0 (α * exp(0) = α)
         @test surrogate_exponential(0.0f0, 1.0f0) ≈ 1.0f0 atol=0.01f0
         for v in -2.0f0:0.5f0:4.0f0
             @test surrogate_exponential(v, 1.0f0) ≥ 0.0f0

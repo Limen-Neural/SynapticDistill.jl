@@ -5,7 +5,7 @@ Implementations of surrogate gradient functions for backpropagation through spik
 """
 
 """
-    surrogate_heaviside(x, γ=1.0)
+    surrogate_heaviside(x, γ=10.0)
 
 A simple rectangular surrogate for the Heaviside step function's derivative.
 
