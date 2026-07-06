@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 using SynapticDistill
 
 # This example simulates a hybrid training scenario where the loss is derived
