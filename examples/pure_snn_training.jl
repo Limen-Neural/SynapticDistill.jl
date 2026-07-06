@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
 using SynapticDistill
 
 # 1. Define a simple SNN model.
