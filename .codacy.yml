@@ -1,12 +1,11 @@
-version: "2"
-
-exclude_patterns:
+---
+exclude_paths:
   - "Manifest.toml"
   - "LICENSE"
   - "LICENSE-APACHE"
   - "*.md"
-  - "docs/"
-  - "benchmarks/"
-  - "examples/"
-  - ".mimocode/"
+  - "docs/**"
+  - "benchmarks/**"
+  - "examples/**"
+  - ".mimocode/**"
   - ".codacy.yml"
