@@ -7,6 +7,7 @@ exclude_patterns:
   - "LICENSE"
   - "LICENSE-APACHE"
   - "*.md"
+  - "AGENTS.md"
   - "docs/**"
   - "benchmarks/**"
   - "examples/**"
