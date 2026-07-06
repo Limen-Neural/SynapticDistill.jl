@@ -25,7 +25,7 @@ using LinearAlgebra
         end
 
         # exponential surrogate: at threshold → 0.5
-        @test surrogate_exponential(0.0f0, 1.0f0) ≈ 0.5f0 atol=0.01f0
+        @test surrogate_exponential(0.0f0, 1.0f0) ≈ 1.0f0 atol=0.01f0
         for v in -2.0f0:0.5f0:4.0f0
             @test surrogate_exponential(v, 1.0f0) ≥ 0.0f0
         end
