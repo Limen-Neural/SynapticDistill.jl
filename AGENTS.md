@@ -72,5 +72,6 @@ julia --project=. -e 'using SynapticDistill; println("OK")'
 
 ## Cursor Cloud specific instructions
 
-- Julia is provided via `juliaup` and the default channel is **1.12**, which matches this repo's committed `Manifest.toml` (`julia_version = "1.12.x"`). Do not test on Julia 1.11: the pinned `PrecompileTools` reference 1.12-only `Base` internals (`Base.StaticData`) and fail to precompile with `UndefVarError`.
-- Standard commands apply (see "Build and test commands" above): `julia --project=. -e 'using Pkg; Pkg.instantiate()'` then `Pkg.test()`. The first instantiate/precompile is slow (~1–2 min) because of Zygote/NNlib; it is cached afterwards.
+- Julia is provided via `juliaup` and the default channel is **1.12**, which matches this repo's committed `Manifest.toml` (`julia_version = "1.12.x"`). Do not test on Julia 1.11: the pinned `PrecompileTools` references 1.12-only `Base` internals (`Base.StaticData`) and fails to precompile with `UndefVarError`.
+- Standard commands apply (see "Build and test commands" above): `julia --project=. -e 'using Pkg; Pkg.instantiate()'`, then `julia --project=. -e 'using Pkg; Pkg.test()'`.
+- The first instantiate/precompile is slow (~1–2 min) because of Zygote/NNlib; it is cached afterward.
