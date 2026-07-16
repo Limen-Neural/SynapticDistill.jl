@@ -1,0 +1,13 @@
+# https://docs.devin.ai/onboard-devin/environment-yaml
+initialize: |
+  curl -fsSL https://install.julialang.org | sh -s -- --yes --default-channel 1.12
+  echo "PATH=$HOME/.juliaup/bin:$PATH" >> $ENVRC
+maintenance: |
+  julia --project=. -e 'using Pkg; Pkg.instantiate()'
+knowledge:
+  - name: test
+    contents: |
+      julia --project=. -e 'using Pkg; Pkg.test()'
+  - name: smoke
+    contents: |
+      julia --project=. -e 'using SynapticDistill; println("OK")'

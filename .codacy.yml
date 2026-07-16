@@ -1,8 +1,7 @@
 ---
----
 version: "2"
 
-exclude_patterns:
+exclude_paths:
   - "Manifest.toml"
   - "LICENSE"
   - "LICENSE-APACHE"

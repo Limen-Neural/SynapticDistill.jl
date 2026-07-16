@@ -1,0 +1,22 @@
+{
+    "name": "Julia 1.12",
+    "image": "julia:1.12.6-bookworm",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2.5.9": {
+            "installZsh": true,
+            "configureZshAsDefaultShell": true,
+            "username": "vscode",
+            "upgradePackages": true
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "julialang.language-julia",
+                "tamasfe.even-better-toml"
+            ]
+        }
+    },
+    "postCreateCommand": "julia --project=. -e 'using Pkg; Pkg.instantiate()'",
+    "remoteUser": "vscode"
+}
