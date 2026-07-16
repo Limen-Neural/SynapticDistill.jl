@@ -3,10 +3,10 @@
     "image": "julia:1.12",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
-            "installZsh": "true",
+            "installZsh": true,
             "configureZshAsDefaultShell": true,
             "username": "vscode",
-            "upgradePackages": "true"
+            "upgradePackages": true
         }
     },
     "customizations": {
