@@ -1,13 +1,22 @@
 {
-    "name": "Julia (Community)",
-    "image": "ghcr.io/julia-vscode/julia-devcontainer",
+    "name": "Julia 1.12",
+    "image": "julia:1.12",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": "true",
+            "configureZshAsDefaultShell": true,
+            "username": "vscode",
+            "upgradePackages": "true"
+        }
+    },
     "customizations": {
         "vscode": {
             "extensions": [
-                "julialang.language-julia"
+                "julialang.language-julia",
+                "tamasfe.even-better-toml"
             ]
         }
     },
-    "postCreateCommand": "/julia-devcontainer-scripts/postcreate.jl",
+    "postCreateCommand": "julia --project=. -e 'using Pkg; Pkg.instantiate()'",
     "remoteUser": "vscode"
 }
