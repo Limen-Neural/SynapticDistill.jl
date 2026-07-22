@@ -4,6 +4,7 @@ using Test
 using SynapticDistill
 using LinearAlgebra
 using Statistics
+using Zygote
 
 # Top-level mock model (structs cannot be defined inside @testset local scope).
 mutable struct MockSNN
@@ -59,7 +60,10 @@ end
         calls = Ref(0)
 
         function mock_step(model, batch::SpikeBatch)
-            calls[] += 1
+            # Side-effect must not be traced by Zygote (model step runs inside withgradient).
+            Zygote.ignore_derivatives() do
+                calls[] += 1
+            end
             rates = vec(mean(batch.spikes; dims=2))
             return (logits = model.weights * rates,)
         end

@@ -94,7 +94,9 @@ function train_step!(model, spikes::SpikeBatch, loss_fn;
         loss_fn(output)
     end
     loss = result.val
-    grads = result.grad
+    # withgradient(model) returns grad as a 1-tuple (one entry per AD argument).
+    g = result.grad
+    grads = g === nothing ? nothing : (g isa Tuple ? g[1] : g)
 
     loss isa Number || throw(ArgumentError(
         "`loss_fn` must return a numeric scalar, got $(typeof(loss))."))
