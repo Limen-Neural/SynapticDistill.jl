@@ -3,22 +3,24 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE-APACHE)
 
-**Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more. Works with pure SNNs or hybrid SNN+LLM systems.**
+**Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more. Works with pure SNNs or hybrid teacher-student systems.**
 
-`SynapticDistill.jl` is a flexible and performant library for training spiking neural networks (SNNs) using online (event-based) learning rules. It is designed to be framework-agnostic, allowing researchers to bring their own models, loss functions, and data sources.
+`SynapticDistill.jl` is a flexible and performant library for training spiking neural networks (SNNs) using online (event-based) learning rules. It is designed to be framework-agnostic, allowing researchers to bring their own models, model-step callbacks, loss functions, and data sources.
 
 ## Core Philosophy
 
-- **Bring any loss**: The training process is driven by a user-provided loss function. This can be a standard metric like mean squared error for pure SNN tasks, or it can be a cross-entropy loss derived from a frozen large language model (LLM) in a hybrid setup.
+- **Bring any model step**: The package does not own a global `forward` implementation. Callers inject a pure function or callable object that maps `(model, spikes::SpikeBatch)` to the model output used by the loss.
+- **Bring any loss**: The training process is driven by a user-provided loss function. This can be a standard metric like mean squared error for pure SNN tasks, or it can be a distillation loss derived from a frozen teacher model in a hybrid setup.
 - **Apply any rule**: The library provides a modular system for learning rules, starting with e-prop and OTTT. Researchers can easily add their own rules.
-- **Update only the SNN**: In hybrid systems, the library is designed to update only the SNN parameters, leaving the external model (like an LLM) frozen.
+- **Update only the SNN**: In hybrid systems, the library is designed to update only the SNN parameters, leaving any external teacher model frozen.
 
 ## Quick Start (Pure SNN Training)
 
-Here's a simple example of how to train an SNN using a standard loss function.
+Here's a simple example of how to train an SNN using an injected model step and a standard loss function.
 
 ```julia
 using SynapticDistill
+using Statistics
 
 # 1. Define your SNN model
 mutable struct MySNN
@@ -28,38 +30,42 @@ end
 model = MySNN(rand(Float32, 10, 10))
 
 # 2. Create a batch of spike data
-spike_data = rand(0:1, 10, 100)
+spike_data = Float32.(rand(0:1, 10, 100))
 spike_batch = SpikeBatch(spike_data, nothing, nothing)
 
-# 3. Define a loss function
+# 3. Inject a model step. It can be any callable with this signature:
+#    (model, spikes::SpikeBatch) -> output
+function model_step(model, spikes::SpikeBatch)
+    rates = vec(mean(spikes.spikes; dims=2))
+    return (logits = model.weights * rates,)
+end
+
+# 4. Define a loss function over the model-step output
 mse_loss(output) = sum(output.logits .^ 2)
 
-# 4. Run a training step
-model, state = train_step!(model, spike_batch, mse_loss, rule=:eprop)
+# 5. Run a training step
+model, state = train_step!(model, spike_batch, mse_loss; forward_fn=model_step, rule=:eprop)
 
 println("Loss: ", state.loss)
 ```
 
 For a complete, runnable example, see [`examples/pure_snn_training.jl`](examples/pure_snn_training.jl).
 
-## Hybrid Usage (with MoE Loss via `spikenaut-spine`)
+## Hybrid Usage (Teacher-Student Distillation)
 
-`SynapticDistill.jl` is perfect for hybrid systems where an SNN is trained to distill knowledge from a larger model. The key is to provide a loss function that captures the output of the external model.
+`SynapticDistill.jl` can be used in hybrid systems where an SNN is trained to distill knowledge from a larger teacher model. Keep teacher-specific integration outside this package: capture the teacher targets in your loss function, and inject only the SNN's model step.
 
 ```julia
-# --- In your spikenaut-spine listener ---
+# Assume `teacher_targets` came from your application-specific teacher pipeline.
+teacher_targets = get_teacher_targets(batch_id)
 
-# Assume `llm_targets` are received from the LLM via the spine
-llm_targets = receive_from_spine().targets
+function model_step(model, spikes::SpikeBatch)
+    return (logits = run_snn(model, spikes.spikes),)
+end
 
-# Create a closure for the loss function that captures the targets
-loss_fn = (output) -> cross_entropy(output.logits, llm_targets)
+loss_fn = output -> cross_entropy(output.logits, teacher_targets)
 
-# Run the training step
-model, state = train_step!(model, spike_batch, loss_fn, rule=:eprop)
-
-# Send the gradients back to the spine to update the SNN in Rust
-send_to_spine(GradientUpdate(state.gradients))
+model, state = train_step!(model, spike_batch, loss_fn; forward_fn=model_step, rule=:eprop)
 ```
 
 For a complete, runnable example, see [`examples/hybrid_moe_training.jl`](examples/hybrid_moe_training.jl).
@@ -69,16 +75,15 @@ For a complete, runnable example, see [`examples/hybrid_moe_training.jl`](exampl
 - `:eprop`: Eligibility propagation.
 - `:ottt`: Online Spatio-Temporal Trace Training.
 
-## Custom Loss Functions
+## Custom Model Steps and Loss Functions
 
-Any function that takes the model's output and returns a scalar loss is a valid loss function. The output of the model is whatever the `forward` function of your model returns.
+A `ModelStep` is any callable object with signature `(model, spikes::SpikeBatch) -> output`. The output can be any Julia value accepted by your loss function, such as a named tuple containing logits, spike counts, membrane potentials, or task-specific metrics.
 
-## Integration with the Spikenaut Ecosystem
+Any function that takes that output and returns a scalar loss is a valid loss function.
 
-`SynapticDistill.jl` is designed to integrate seamlessly with the other components of the Spikenaut ecosystem:
+## Integration
 
-- **`spikenaut-spine`**: The spine can be used to pass spike data and LLM targets to `SynapticDistill.jl` and to receive gradients for updating the SNN.
-- **`spikenaut-hybrid`**: The hybrid system can use `SynapticDistill.jl` as its training engine for the SNN component.
+`SynapticDistill.jl` is intentionally framework-agnostic. Application-specific IPC, teacher-model execution, hardware interfaces, and domain-specific model architectures should live in caller code and connect through injected model-step and loss callbacks.
 
 ## License
 

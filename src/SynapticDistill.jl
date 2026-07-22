@@ -4,7 +4,7 @@
 SynapticDistill.jl
 
 Modular online training for spiking neural networks in Julia — E-prop, OTTT, and more.
-Works with pure SNNs or hybrid SNN+LLM systems.
+Works with pure SNNs or hybrid teacher-student systems.
 """
 module SynapticDistill
 
@@ -28,6 +28,6 @@ export surrogate_heaviside, surrogate_sigmoid, surrogate_exponential
 
 # Main training loop
 include("training.jl")
-export train_step!
+export ModelStep, train_step!
 
 end # module

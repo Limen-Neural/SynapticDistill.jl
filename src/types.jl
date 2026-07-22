@@ -10,7 +10,7 @@ struct SpikeBatch
     spikes::Any 
     # Optional: Timestamps for each spike, if not implicitly defined by array index.
     times::Union{Nothing, Vector{Float32}}
-    # Optional: Targets for supervised learning, e.g., from an LLM.
+    # Optional: Targets for supervised or teacher-student learning.
     targets::Any
 end
 
