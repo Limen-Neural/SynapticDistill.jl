@@ -9,9 +9,18 @@ Main training entry point for SynapticDistill.
 
 Callable interface for model forward steps used by `train_step!`.
 
-A model step is any callable object with the signature
+A model step is any callable with the signature
 `model_step(model, spikes::SpikeBatch) -> output`. The returned `output` is
 passed unchanged to the caller-provided loss function.
+
+Subtypes may implement the call overload:
+
+```julia
+struct MyStep <: ModelStep end
+(::MyStep)(model, spikes::SpikeBatch) = ...
+```
+
+Plain `Function`s and other callable objects are also accepted by `train_step!`.
 """
 abstract type ModelStep end
 
@@ -21,9 +30,38 @@ function default_optimizer()
     return (params, grads) -> params .-= 0.001f0 .* grads
 end
 
+"""
+    validate_model_step(model_step)
+
+Validate that `model_step` is present and callable.
+
+Accepts:
+- plain `Function`s
+- subtypes of [`ModelStep`](@ref)
+- any other object with methods (callable structs)
+
+Does not fully pre-check arity/signature: `hasmethod(..., Tuple{Any,SpikeBatch})`
+rejects callables typed to a concrete model type, and applicability needs a real
+model instance. Incompatible callables therefore surface as `MethodError` at the
+call site inside `train_step!`.
+"""
 function validate_model_step(model_step)
-    model_step === nothing && throw(ArgumentError("`forward_fn` is required; pass a callable `(model, spikes::SpikeBatch) -> output` to `train_step!`."))
-    !(model_step isa Function) && !hasmethod(model_step, Tuple{Any, SpikeBatch}) && throw(ArgumentError("`forward_fn` must be callable as `(model, spikes::SpikeBatch) -> output`."))
+    model_step === nothing && throw(ArgumentError(
+        "`forward_fn` is required; pass a callable `(model, spikes::SpikeBatch) -> output` to `train_step!`."))
+
+    # Accept Function, ModelStep subtypes, or any object that has methods (callable).
+    if model_step isa Function || model_step isa ModelStep
+        return model_step
+    end
+
+    local has_methods = false
+    try
+        has_methods = !isempty(methods(model_step))
+    catch
+        has_methods = false
+    end
+    has_methods || throw(ArgumentError(
+        "`forward_fn` must be callable as `(model, spikes::SpikeBatch) -> output`."))
     return model_step
 end
 
@@ -49,13 +87,20 @@ function train_step!(model, spikes::SpikeBatch, loss_fn;
 
     model_step = validate_model_step(forward_fn)
 
-    # 1. Forward pass through the caller-provided model step.
-    output = model_step(model, spikes)
+    # Differentiate through the injected model step so gradients depend on model params.
+    # Zygote.withgradient returns a NamedTuple `(val, grad)`.
+    result = Zygote.withgradient(model) do m
+        output = model_step(m, spikes)
+        loss_fn(output)
+    end
+    loss = result.val
+    grads = result.grad
 
-    # 2. Compute the loss using the user-provided function.
-    loss, grads = Zygote.withgradient(() -> loss_fn(output), Zygote.params(model))
+    loss isa Number || throw(ArgumentError(
+        "`loss_fn` must return a numeric scalar, got $(typeof(loss))."))
+    loss = Float32(loss)
 
-    # 3. Apply the chosen learning rule.
+    # Apply the chosen learning rule.
     if rule == :eprop
         # The `update_eprop!` function will calculate eligibility traces and gradients.
         # update_eprop!(model, spikes, loss, output; kwargs...)
@@ -67,12 +112,12 @@ function train_step!(model, spikes::SpikeBatch, loss_fn;
         error("Unknown training rule: `$rule`")
     end
 
-    # 4. Apply gradients (this is a simplified view).
+    # Apply gradients (this is a simplified view).
     # In a real implementation, the rule-specific function would return gradients
     # to be applied here.
-    # optimizer(Zygote.params(model), grads)
+    # optimizer(... , grads)
 
-    # 5. Return the updated model and training state.
+    # Return the updated model and training state.
     state = TrainingState(loss=loss, gradients=grads)
     return model, state
 end

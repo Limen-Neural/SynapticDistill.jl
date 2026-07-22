@@ -5,6 +5,18 @@ using SynapticDistill
 using LinearAlgebra
 using Statistics
 
+# Top-level mock model (structs cannot be defined inside @testset local scope).
+mutable struct MockSNN
+    weights::Matrix{Float32}
+end
+
+# Callable ModelStep subtype used to exercise the typed-callable path.
+struct MockStep <: ModelStep end
+function (::MockStep)(model::MockSNN, batch::SpikeBatch)
+    rates = vec(mean(batch.spikes; dims=2))
+    return (logits = model.weights * rates,)
+end
+
 @testset "SynapticDistill" begin
 
     @testset "Package loads" begin
@@ -41,12 +53,7 @@ using Statistics
         end
     end
 
-
     @testset "train_step! model step injection" begin
-        mutable struct MockSNN
-            weights::Matrix{Float32}
-        end
-
         model = MockSNN(Float32[1 2; 3 4])
         spikes = SpikeBatch(Float32[1 0 1; 0 1 1], nothing, nothing)
         calls = Ref(0)
@@ -59,22 +66,41 @@ using Statistics
 
         loss_fn(output) = sum(output.logits)
 
-        buffer = IOBuffer()
-        updated_model, state = redirect_stdout(buffer) do
+        # rates = [2/3, 2/3]; logits = W * rates = [2, 14/3]; sum = 20/3
+        expected_loss = 20.0f0 / 3.0f0
+
+        updated_model, state = redirect_stdout(devnull) do
             train_step!(model, spikes, loss_fn; forward_fn=mock_step, rule=:eprop)
         end
 
         @test updated_model === model
         @test calls[] == 1
-        @test state.loss ≈ 20.0f0 / 3.0f0
-        @test !occursin("forward function is not implemented", String(take!(buffer)))
+        @test state.loss ≈ expected_loss
+        @test state.gradients !== nothing
 
         calls[] = 0
-        _, positional_state = train_step!(model, spikes, loss_fn, mock_step; rule=:ottt)
+        _, positional_state = redirect_stdout(devnull) do
+            train_step!(model, spikes, loss_fn, mock_step; rule=:ottt)
+        end
         @test calls[] == 1
-        @test positional_state.loss ≈ 20.0f0 / 3.0f0
+        # Same mock forward+loss; rule only prints a stub message, so loss matches.
+        @test positional_state.loss ≈ expected_loss
 
         @test_throws ArgumentError train_step!(model, spikes, loss_fn; rule=:eprop)
+        @test_throws ArgumentError train_step!(model, spikes, loss_fn; forward_fn=42, rule=:eprop)
+    end
+
+    @testset "train_step! ModelStep callable struct" begin
+        model = MockSNN(Float32[1 2; 3 4])
+        spikes = SpikeBatch(Float32[1 0 1; 0 1 1], nothing, nothing)
+        loss_fn(output) = sum(output.logits)
+        expected_loss = 20.0f0 / 3.0f0
+
+        _, state = redirect_stdout(devnull) do
+            train_step!(model, spikes, loss_fn; forward_fn=MockStep(), rule=:eprop)
+        end
+        @test state.loss ≈ expected_loss
+        @test state.gradients !== nothing
     end
 
 end
